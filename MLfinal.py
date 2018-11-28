@@ -45,30 +45,33 @@ def main():
     # print(survival0[2]) # survival rate of patients in cluster 0
     # print(survival0[3]) # survival rate of patients in cluster 1
 
-    selectedFeatures = selectFeatures(dv, X_vec, peopleData[3]) # select top 50 genes using f_classif
-    print("selected features")
+    # selectedFeatures = selectFeatures(dv, X_vec, peopleData[3]) # select top 50 genes using f_classif
+    # print("selected features")
+    #
+    # geneIndices = findGeneIndex(selectedFeatures[0], geneData[0]) # gene indices of selected genes
+    # print("found gene indices")
+    #
+    # newGenes = limitGenes(geneIndices, geneData[2]) # patient gene data for selected genes
+    # print(" got new gene data")
+    #
+    # newCluster = makeClusters(newGenes) # make clusters from selected genes
+    # print("made new clusters")
+    #
+    # makeNewDendrogram(newGenes) # make new dendrogram from selected genes
+    # print("made dendrogram")
+    #
+    # survival = findSurvivalRatio(newCluster, geneData[1], peopleData[2])# get the survival stats for  clusters
+    # print("got survival stats")
+    # print(len(survival[0])) # number of patients in cluster0
+    # print(len(survival[1])) # number of patients in cluster1
+    # print(survival[2]) # survival rate of patients in cluster 0
+    # print(survival[3])  # survival rate of patients in cluster 1
 
-    geneIndices = findGeneIndex(selectedFeatures[0], geneData[0]) # gene indices of selected genes
-    print("found gene indices")
-
-    newGenes = limitGenes(geneIndices, geneData[2]) # patient gene data for selected genes
-    print(" got new gene data")
-
-    newCluster = makeClusters(newGenes) # make clusters from selected genes
-    print("made new clusters")
-
-    makeNewDendrogram(newGenes) # make new dendrogram from selected genes
-    print("made dendrogram")
-
-    survival = findSurvivalRatio(newCluster, geneData[1], peopleData[2])# get the survival stats for  clusters
-    print("got survival stats")
-    print(len(survival[0])) # number of patients in cluster0
-    print(len(survival[1])) # number of patients in cluster1
-    print(survival[2]) # survival rate of patients in cluster 0
-    print(survival[3])  # survival rate of patients in cluster 1
-
-    #runNN(training_x, training_y, 0.01, 100)
-    #gtestNN(test_x, test_y, 0.01, 100)
+    x = geneData[2]
+    y = peopleData[3]
+    [training_x, training_y, csv_x, csv_y, test_x, test_y, training_data_labeled, csv_data_labeled] = splitData(x, y)
+    runNN(training_x, training_y, 0.01, 100)
+    testNN(test_x, test_y, 0.01, 100)
 
 def runNN(x_data_set, y_data_set, alpha, num_epochs):
     #NEED TO ADD TEST AND TRAIN ACCURARCY AND KEEP TRACK OF THE LOSS THEN WE CAN GRAPH THAT TO SEE THE CHANGE WITH ITERATIONS
@@ -87,7 +90,7 @@ def runNN(x_data_set, y_data_set, alpha, num_epochs):
 
         loss = criterion(y_pred, y_data_set)
 
-        #print(epoch, loss.data[0])
+        print(epoch, loss.data[0])
 
         optimizer.zero_grad()
 
@@ -110,6 +113,8 @@ def testNN(x_data_set, y_data_set, alpha, num_epochs):
         y_pred = model(x_data_set)
 
         loss = criterion(y_pred, y_data_set)
+
+        print(epoch, loss.data[0])
 
     return test_accuracy
 
@@ -193,59 +198,61 @@ def readPatientFile():
             line_count += 1
     return [people, demographics, survivalData, survival]
 
-def makeClusters(patientData):
-    """ Returns clusters"""
-    cluster = AgglomerativeClustering().fit_predict(patientData)  # perform clustering on patientData and return cluster labels
-    return cluster
+# def makeClusters(patientData):
+#     """ Returns clusters"""
+#     cluster = AgglomerativeClustering().fit_predict(patientData)  # perform clustering on patientData and return cluster labels
+#     return cluster
+#
+#
+# def makeFirstDendrogram(patientData):
+#     """ Creates initial dendrogram"""
+#     linked = linkage(patientData, 'single')
+#     plt.figure(figsize=(100, 100))
+#     dendrogram(linked,  orientation='top',labels=None,distance_sort='descending',show_leaf_counts=True)
+#     plt.title("Initial Gene Dendrograms")
+#     plt.xlabel("Genes")
+#     plt.ylabel("Euclidean Distance between points")
+#     plt.show()
+#
+# def makeNewDendrogram(patientData):
+#     """ Creates new dendrogram for smaller subset of genes"""
+#     linked = linkage(patientData, 'single')
+#     plt.figure(figsize=(100, 100))
+#     dendrogram(linked,  orientation='top',labels=None,distance_sort='descending',show_leaf_counts=True)
+#     plt.title("Selected Gene Dendrogram")
+#     plt.xlabel("Genes")
+#     plt.ylabel("Euclidean Distance between points")
+#     plt.show()
+#
+#
+# def findSurvivalRatio(cluster, patients, survivalData):
+#     """ Returns an array containing each clusters survival rate ratio"""
+#     print(cluster)
+#     cluster0 = []
+#     survival0 = []
+#     cluster1 = []
+#     survival1 = []
+#     for i in range(len(cluster)):
+#         if cluster[i] == 0:
+#             cluster0.append(patients[i])
+#             survival0.append(survivalData[i][23])
+#         else:
+#             cluster1.append(patients[i])
+#             survival1.append(survivalData[i][23])
+#
+#     count0 = 0
+#     count1 = 0
+#     for i in range(len(survival0)):
+#         if survival0[i] == "0":
+#             count0 += 1
+#     for i in range(len(survival1)):
+#         if survival1[i] == "0":
+#             count1 += 1
+#     cluster0survivalratio = count0/len(survival0)
+#     cluster1survivalratio = count1/len(survival1)
+#     return [cluster0, cluster1, cluster0survivalratio, cluster1survivalratio]
 
 
-def makeFirstDendrogram(patientData):
-    """ Creates initial dendrogram"""
-    linked = linkage(patientData, 'single')
-    plt.figure(figsize=(100, 100))
-    dendrogram(linked,  orientation='top',labels=None,distance_sort='descending',show_leaf_counts=True)
-    plt.title("Initial Gene Dendrograms")
-    plt.xlabel("Genes")
-    plt.ylabel("Euclidean Distance between points")
-    plt.show()
-
-def makeNewDendrogram(patientData):
-    """ Creates new dendrogram for smaller subset of genes"""
-    linked = linkage(patientData, 'single')
-    plt.figure(figsize=(100, 100))
-    dendrogram(linked,  orientation='top',labels=None,distance_sort='descending',show_leaf_counts=True)
-    plt.title("Selected Gene Dendrogram")
-    plt.xlabel("Genes")
-    plt.ylabel("Euclidean Distance between points")
-    plt.show()
-
-
-def findSurvivalRatio(cluster, patients, survivalData):
-    """ Returns an array containing each clusters survival rate ratio"""
-    print(cluster)
-    cluster0 = []
-    survival0 = []
-    cluster1 = []
-    survival1 = []
-    for i in range(len(cluster)):
-        if cluster[i] == 0:
-            cluster0.append(patients[i])
-            survival0.append(survivalData[i][23])
-        else:
-            cluster1.append(patients[i])
-            survival1.append(survivalData[i][23])
-
-    count0 = 0
-    count1 = 0
-    for i in range(len(survival0)):
-        if survival0[i] == "0":
-            count0 += 1
-    for i in range(len(survival1)):
-        if survival1[i] == "0":
-            count1 += 1
-    cluster0survivalratio = count0/len(survival0)
-    cluster1survivalratio = count1/len(survival1)
-    return [cluster0, cluster1, cluster0survivalratio, cluster1survivalratio]
 def splitData(x_data, y_data):
     X = torch.tensor(([2, 9], [1, 5], [3, 6]), dtype=torch.float)  # 3 X 2 tensor
     y = torch.tensor(([92], [100], [89]), dtype=torch.float)
@@ -282,10 +289,10 @@ def splitData(x_data, y_data):
     # convert to numpy arrays
     training_x = array(training_x, dtype=np.float32)
     training_y = array(training_y, dtype=np.float32)
-    csv_x = array(csv_x)
-    csv_y = array(csv_y)
-    test_x = array(test_x)
-    test_y = array(test_y)
+    csv_x = array(csv_x, dtype=np.float32)
+    csv_y = array(csv_y, dtype=np.float32)
+    test_x = array(test_x, dtype=np.float32)
+    test_y = array(test_y, dtype=np.float32)
 
     #convert to tensors
     training_x = Variable(torch.from_numpy(training_x))
