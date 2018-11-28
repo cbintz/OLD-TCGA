@@ -16,6 +16,11 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 from sklearn.feature_extraction import DictVectorizer
 import csv
 import random
+import torch
+import torch.nn as nn
+from torch.autograd import Variable
+import torch.nn.functional as F
+from numpy import array
 
 def main():
     """ Runs program """
