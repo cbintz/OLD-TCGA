@@ -73,30 +73,50 @@ def main():
     y_data = ['0', '0', '1', '0', '0', '0', '0', '1', '1', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '0', '0', '0', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '1', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '1', '1', '1', '0', '0', '0', '1', '1', '1', '0', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '0', '0', '1', '1', '0', '0', '1', '0', '0', '0', '0', '0', '0', '1', '1', '0', '1', '0', '1', '1', '1', '1', '0', '1', '1', '0', '1', '0', '0', '0', '1', '0', '0', '1', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '1', '1', '0', '0', '0', '0', '1', '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '1', '0', '0', '0', '0', '1', '0', '0', '1', '0', '0', '1', '0', '1', '1', '1', '1', '1', '0', '0', '1', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '1', '1', '0', '0', '0', '0', '1', '1', '1', '0', '1', '1', '1', '1', '0', '0', '0', '0', '1', '0', '1', '1', '1', '1', '0', '0', '0', '0', '1', '1', '1', '1', '1', '0', '1', '1', '0', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '0', '0', '0', '0', '1', '0', '0', '1', '0', '1', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '1', '0', '0', '0', '1', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '1', '0', '1', '1', '0', '0', '0', '0', '0', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '1', '0']
     #y = peopleData[3]
     y = y_data
-    [training_x, training_y, csv_x, csv_y, test_x, test_y, training_data_labeled, csv_data_labeled] = splitData(x, y)
-    print(test_y)
-    print(test_x)
-    runNN(training_x, training_y, 0.01, 100)
-    testNN(test_x, test_y, 0.01, 100)
+    [training_x, training_y, csv_x, csv_y, test_x, test_y, training_data_labeled,
+     csv_data_labeled] = splitData(x, y)
+    runNN(training_x, training_y, 0, 100)
+    #testNN(test_x, test_y, 0.01, 100)
 
 def runNN(x_data_set, y_data_set, alpha, num_epochs):
-    #NEED TO ADD TEST AND TRAIN ACCURARCY AND KEEP TRACK OF THE LOSS THEN WE CAN GRAPH THAT TO SEE THE CHANGE WITH ITERATIONS
     train_accurary = []
 
     model = Neural_Network(len(x_data_set[0]), 50)
 
     model.train() #set model to training mode
 
-    criterion = torch.nn.BCELoss(reduction='elementwise_mean')
+    criterion = nn.BCELoss(reduction='elementwise_mean')
 
     optimizer = torch.optim.SGD(model.parameters(), lr=alpha)
 
-    for epoch in range(num_epochs): #change range
+    loss_per_epoch = []
+
+    epoch_indexes = []
+
+    for epoch in range(num_epochs):
         y_pred = model(x_data_set)
 
         loss = criterion(y_pred, y_data_set)
 
-        print('epoch {}, loss {} '.format(epoch, loss.data.item))
+        num_correct = 0
+        index = 0
+
+        for prediction in y_pred:
+            if prediction < 0.5:
+                if y_data_set[index] == 0:
+                    num_correct += 1
+            elif prediction >= 0.5:
+                if y_data_set[index] == 1:
+                    num_correct += 1
+            index += 1
+
+        epoch_acc = num_correct / len(x_data_set)
+
+        epoch_loss = loss.item()
+
+        print('{} Loss: {:.4f} Acc: {:.4f}'.format(epoch, epoch_loss, epoch_acc))
+
+        loss_per_epoch.append(epoch_loss)
 
         optimizer.zero_grad()
 
@@ -104,16 +124,25 @@ def runNN(x_data_set, y_data_set, alpha, num_epochs):
 
         optimizer.step() #institutes gradient descent
 
+        epoch_indexes.append(epoch)
+
+    plt.plot(epoch_indexes, loss_per_epoch)
+    plt.ylabel('J')
+    plt.xlabel('Number of Iterations')
+
+    plt.show()
+
     return train_accurary
 
 def testNN(x_data_set, y_data_set, alpha, num_epochs):
+    #need to add in accuracy measures like above
     test_accuracy = []
 
     model = Neural_Network(len(x_data_set[0]), 50)
 
     model.eval() #set model to evaluation mode
 
-    criterion = torch.nn.BCELoss(reduction='elementwise_mean')
+    criterion = nn.BCELoss(reduction='elementwise_mean')
 
     for epoch in range(num_epochs): #change range
         y_pred = model(x_data_set)
@@ -271,7 +300,7 @@ def splitData(x_data, y_data):
     for i in range(len(x_data)):
         if i < 412:
             training_x.append(x_data[i])
-            training_y.append([float(y_data[i])])
+            training_y.append(float(y_data[i]))
         elif i < 463:
             csv_x.append(x_data[i])
             csv_y.append(y_data[i])
@@ -293,7 +322,8 @@ def splitData(x_data, y_data):
 
     # convert to numpy arrays
     training_x = array(training_x, dtype=np.float32)
-    training_y = array(training_y, dtype=np.float32)
+    training_y = array(training_y, dtype=np.long)
+
     csv_x = array(csv_x, dtype=np.float32)
     csv_y = array(csv_y, dtype=np.float32)
     test_x = array(test_x, dtype=np.float32)
