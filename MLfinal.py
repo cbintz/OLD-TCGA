@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Nov 18 15:02:56 2018
-
+final project machine learning
 @author: corinnebintz and lillieatkins
 """
 from sys import platform as sys_pf
