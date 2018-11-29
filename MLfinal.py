@@ -75,11 +75,11 @@ def main():
     y = y_data
     [training_x, training_y, csv_x, csv_y, test_x, test_y, training_data_labeled,
      csv_data_labeled] = splitData(x, y)
-    runNN(training_x, training_y, 0, 100)
+    runNN(training_x, training_y, 0, 3)
     #testNN(test_x, test_y, 0.01, 100)
 
 def runNN(x_data_set, y_data_set, alpha, num_epochs):
-    train_accurary = []
+    train_accuracy = []
 
     model = Neural_Network(len(x_data_set[0]), 50)
 
@@ -87,13 +87,15 @@ def runNN(x_data_set, y_data_set, alpha, num_epochs):
 
     criterion = nn.BCELoss(reduction='elementwise_mean')
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=alpha)
+    optimizer = torch.optim.SGD(model.parameters(), lr=alpha) #SHOULD I TRY A DIFFERENT OPTIMIZER FUNCTION
 
     loss_per_epoch = []
 
     epoch_indexes = []
 
     for epoch in range(num_epochs):
+        #print(list(model.parameters())[0]) #why does this have 6 parameters? shouldn't it only have 3 for this size nueral network? DON'T THINK THESE ARE UPDATING
+
         y_pred = model(x_data_set)
 
         loss = criterion(y_pred, y_data_set)
@@ -132,10 +134,10 @@ def runNN(x_data_set, y_data_set, alpha, num_epochs):
 
     plt.show()
 
-    return train_accurary
+    return train_accuracy
 
 def testNN(x_data_set, y_data_set, alpha, num_epochs):
-    #need to add in accuracy measures like above
+    #NEED TO UPDATE LIKE ABOVE FUNCTION
     test_accuracy = []
 
     model = Neural_Network(len(x_data_set[0]), 50)
@@ -300,7 +302,7 @@ def splitData(x_data, y_data):
     for i in range(len(x_data)):
         if i < 412:
             training_x.append(x_data[i])
-            training_y.append(float(y_data[i]))
+            training_y.append([float(y_data[i])])
         elif i < 463:
             csv_x.append(x_data[i])
             csv_y.append(y_data[i])
@@ -322,16 +324,17 @@ def splitData(x_data, y_data):
 
     # convert to numpy arrays
     training_x = array(training_x, dtype=np.float32)
-    training_y = array(training_y, dtype=np.long)
+    training_y = array(training_y, dtype=np.float32)
 
     csv_x = array(csv_x, dtype=np.float32)
     csv_y = array(csv_y, dtype=np.float32)
     test_x = array(test_x, dtype=np.float32)
     test_y = array(test_y, dtype=np.float32)
 
-    #convert to tensors
+    #convert to tensors THESE SHOULD ALL BE VARIABLES
     training_x = Variable(torch.from_numpy(training_x))
     training_y = Variable(torch.from_numpy(training_y))
+    print(type(training_y))
     csv_x = Variable(torch.from_numpy(csv_x))
     csv_y = Variable(torch.from_numpy(csv_y))
     test_x = Variable(torch.from_numpy(test_x))
